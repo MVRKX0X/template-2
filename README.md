@@ -1,15 +1,39 @@
-# Ansh & Riley Full-Stack Template
+# NXTBET F1 Prediction App
 
-This is a full-stack template project for Software Composers to create  applications with AI.
+A Next.js application for F1 race predictions and quizzes.
 
-## Getting started
-To create a new project, you go to `/paths`, choose from our list of Paths, and then use Cursor's Composer feature to quickly scaffold your project!
+## Features
 
-You can also edit the Path's prompt template to be whatever you like!
+- F1 Race Predictions
+- Weekly F1 Quizzes
+- User Authentication with Firebase
+- Points System
+- Leaderboard
+- User Profiles
 
-## Technologies used
-This doesn't really matter, but is useful for the AI to understand more about this project. We are using the following technologies
-- React with Next.js 14 App Router
-- TailwindCSS
-- Firebase Auth, Storage, and Database
-- Multiple AI endpoints including OpenAI, Anthropic, and Replicate using Vercel's AI SDK
+## Technologies Used
+
+- Next.js 14 App Router
+- React
+- TypeScript
+- Tailwind CSS
+- Firebase (Authentication, Database, Storage)
+
+## Getting Started
+
+1. Sign in with Google
+2. Get 1000 starting points
+3. Participate in quizzes to earn points
+4. Place bets on race predictions
+5. Track your progress on the leaderboard
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+## Deployment
+
+This project is deployed on Vercel.
