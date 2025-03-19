@@ -1,48 +1,60 @@
-import Link from "next/link";
+import Navbar from '@/components/Navbar';
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-8">
-      <div>
-        <h2 className="text-2xl font-semibold text-center border p-4 font-mono rounded-md">
-          Get started by choosing a template path from the /paths/ folder.
-        </h2>
-      </div>
-      <div>
-        <h1 className="text-6xl font-bold text-center">Make anything you imagine 🪄</h1>
-        <h2 className="text-2xl text-center font-light text-gray-500 pt-4">
-          This whole page will be replaced when you run your template path.
-        </h2>
-      </div>
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="border rounded-lg p-6 hover:bg-gray-100 transition-colors">
-          <h3 className="text-xl font-semibold">AI Chat App</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            An intelligent conversational app powered by AI models, featuring real-time responses
-            and seamless integration with Next.js and various AI providers.
+    <main className="min-h-screen">
+      <Navbar />
+      
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center mb-16">
+          <h1 className="text-6xl font-bold mb-6 text-[#E10600]">
+            NXTBET F1
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Test your Formula 1 knowledge, make predictions, and compete with other fans!
           </p>
         </div>
-        <div className="border rounded-lg p-6 hover:bg-gray-100 transition-colors">
-          <h3 className="text-xl font-semibold">AI Image Generation App</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            Create images from text prompts using AI, powered by the Replicate API and Next.js.
-          </p>
-        </div>
-        <div className="border rounded-lg p-6 hover:bg-gray-100 transition-colors">
-          <h3 className="text-xl font-semibold">Social Media App</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            A feature-rich social platform with user profiles, posts, and interactions using
-            Firebase and Next.js.
-          </p>
-        </div>
-        <div className="border rounded-lg p-6 hover:bg-gray-100 transition-colors">
-          <h3 className="text-xl font-semibold">Voice Notes App</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            A voice-based note-taking app with real-time transcription using Deepgram API, 
-            Firebase integration for storage, and a clean, simple interface built with Next.js.
-          </p>
+
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <FeatureCard
+            title="Weekly Quiz"
+            description="Test your F1 knowledge with our weekly quiz and earn points"
+            link="/quiz"
+            icon="🎯"
+          />
+          <FeatureCard
+            title="Race Predictions"
+            description="Bet your points on race outcomes with dynamic odds"
+            link="/predictions"
+            icon="🏎️"
+          />
+          <FeatureCard
+            title="Leaderboard"
+            description="Compete with other fans and climb the global rankings"
+            link="/leaderboard"
+            icon="🏆"
+          />
         </div>
       </div>
     </main>
+  );
+}
+
+function FeatureCard({ title, description, link, icon }: {
+  title: string;
+  description: string;
+  link: string;
+  icon: string;
+}) {
+  return (
+    <Link href={link}>
+      <div className="bg-[#1F1F2B] p-6 rounded-lg hover:bg-[#2A2A3A] transition-colors cursor-pointer">
+        <div className="text-4xl mb-4">{icon}</div>
+        <h3 className="text-xl font-bold mb-2">{title}</h3>
+        <p className="text-gray-400">{description}</p>
+      </div>
+    </Link>
   );
 }
