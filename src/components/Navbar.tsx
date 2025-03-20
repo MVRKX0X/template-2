@@ -1,62 +1,36 @@
+'use client';
+
 import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
-import Image from 'next/image';
-import { useState, useEffect } from 'react';
 
 export default function Navbar() {
   const { user, signIn, signOut } = useAuth();
-  const [points, setPoints] = useState(0);
-
-  useEffect(() => {
-    if (user) {
-      // In production, fetch points from Firebase
-      setPoints(user.points || 0);
-    }
-  }, [user]);
 
   return (
-    <nav className="bg-[#1F1F2B] border-b border-[#2A2A3A]">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-[#E10600]">NXTBET</span>
-          </Link>
-
-          <div className="flex items-center space-x-6">
-            <Link href="/quiz" className="text-gray-300 hover:text-white">
-              Quiz
+    <nav className="bg-white shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex">
+            <Link href="/" className="flex items-center">
+              <span className="text-xl font-bold text-red-600">NXTBET F1</span>
             </Link>
-            <Link href="/predictions" className="text-gray-300 hover:text-white">
-              Predictions
-            </Link>
-            <Link href="/leaderboard" className="text-gray-300 hover:text-white">
-              Leaderboard
-            </Link>
-            {user && (
-              <Link href="/profile" className="text-gray-300 hover:text-white">
-                Profile
-              </Link>
-            )}
           </div>
-
-          <div className="flex items-center space-x-4">
+          
+          <div className="flex items-center">
             {user ? (
-              <>
-                <div className="flex items-center space-x-2">
-                  <span className="text-[#E10600] font-bold">{points}</span>
-                  <span className="text-gray-400">points</span>
-                </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-gray-700">{user.displayName}</span>
                 <button
                   onClick={signOut}
-                  className="bg-[#2A2A3A] text-white px-4 py-2 rounded-lg hover:bg-[#3A3A4A]"
+                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
                 >
                   Sign Out
                 </button>
-              </>
+              </div>
             ) : (
               <button
                 onClick={signIn}
-                className="bg-[#E10600] text-white px-4 py-2 rounded-lg hover:bg-[#B30500]"
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
               >
                 Sign In with Google
               </button>
