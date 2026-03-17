@@ -27,9 +27,12 @@ export function Header() {
           <button className="rounded-lg border border-[color:var(--color-border-subtle)] bg-transparent px-3 py-1.5 text-xs font-medium text-[color:var(--color-text-secondary)] hover:border-[color:var(--color-border-active)] hover:text-[color:var(--color-text-primary)]">
             List Your Community
           </button>
-          <button className="rounded-lg bg-[color:var(--color-accent-green)] px-3.5 py-1.5 text-xs font-semibold text-black shadow-sm hover:bg-[#00c988]">
+          <a
+            href="/connect/tradovate"
+            className="rounded-lg bg-[color:var(--color-accent-green)] px-3.5 py-1.5 text-xs font-semibold text-black shadow-sm hover:bg-[#00c988]"
+          >
             Connect Account
-          </button>
+          </a>
         </div>
       </div>
     </header>
