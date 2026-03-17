@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
     performance_score: performanceScore,
   });
 
-  await supabase.from("csv_uploads").insert({
+  const uploadFields = {
     trader_id: trader.id,
     broker_format: parseResult.broker,
     filename: file.name,
@@ -109,7 +109,42 @@ export async function POST(req: NextRequest) {
       ? parseResult.dateRange.to.split("T")[0]
       : null,
     performance_score: performanceScore,
+  };
+
+  const { data: uploadRecord } = await supabase
+    .from("csv_uploads")
+    .insert({
+      ...uploadFields,
+    })
+    .select("id")
+    .single();
+
+  const tradeRows = parseResult.trades.map((trade) => {
+    const closedAt = new Date(trade.timestamp);
+    const tradeDate = `${trade.tradeDate.year}-${String(
+      trade.tradeDate.month,
+    ).padStart(2, "0")}-${String(trade.tradeDate.day).padStart(2, "0")}`;
+
+    return {
+      trader_id: trader.id,
+      upload_id: uploadRecord?.id,
+      symbol: trade.symbol,
+      side: trade.side,
+      quantity: trade.quantity,
+      entry_price: trade.entryPrice,
+      exit_price: trade.exitPrice,
+      gross_pnl: trade.grossPnL,
+      fees: trade.fees,
+      net_pnl: trade.netPnL,
+      trade_date: tradeDate,
+      closed_at: closedAt.toISOString(),
+      duration_minutes: null,
+    };
   });
+
+  if (tradeRows.length > 0) {
+    await supabase.from("trades").insert(tradeRows);
+  }
 
   await supabase
     .from("traders")

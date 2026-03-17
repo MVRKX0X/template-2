@@ -203,6 +203,12 @@ function DashboardContent() {
                       View public profile →
                     </a>
                     <a
+                      href="/journal"
+                      className="text-sm text-[#6b7280] hover:text-[#f1f5f9]"
+                    >
+                      View Trade Journal →
+                    </a>
+                    <a
                       href="/explore"
                       className="text-sm text-[#6b7280] hover:text-[#f1f5f9]"
                     >
