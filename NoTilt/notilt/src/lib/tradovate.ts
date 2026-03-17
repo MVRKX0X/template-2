@@ -1,3 +1,5 @@
+import type { NormalizedTrade } from "./csvParser";
+
 const TRADOVATE_BASE_URL = "https://live.tradovateapi.com/v1";
 const TRADOVATE_DEMO_URL = "https://demo.tradovateapi.com/v1";
 const TRADOVATE_AUTH_URL = "https://trader.tradovateapi.com/oauth/auth";
@@ -85,6 +87,32 @@ export interface TradovateTrade {
   grossPnL: number;
   fees: number;
   netPnL: number;
+}
+
+/** Convert API trade shape to NormalizedTrade for metrics. */
+export function tradovateTradesToNormalized(
+  trades: TradovateTrade[],
+): NormalizedTrade[] {
+  return trades.map((t) => {
+    const isBuy = t.boughtQty > 0;
+    const qty = isBuy ? t.boughtQty : t.soldQty;
+    const entryValue = isBuy ? t.boughtValue : t.soldValue;
+    const exitValue = isBuy ? t.soldValue : t.boughtValue;
+    const entryPrice = qty > 0 ? entryValue / qty : 0;
+    const exitPrice = qty > 0 ? exitValue / qty : 0;
+    return {
+      timestamp: t.timestamp,
+      symbol: String(t.contractId),
+      side: isBuy ? "buy" : "sell",
+      quantity: qty,
+      entryPrice,
+      exitPrice,
+      grossPnL: t.grossPnL,
+      fees: t.fees,
+      netPnL: t.netPnL,
+      tradeDate: t.tradeDate,
+    };
+  });
 }
 
 export { TRADOVATE_BASE_URL, TRADOVATE_DEMO_URL };

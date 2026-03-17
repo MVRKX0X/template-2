@@ -73,6 +73,5 @@ describe("calculateCommunityScore", () => {
     const score = calculateCommunityScore(traders, 100, 1);
     expect(score).toBeLessThanOrEqual(100);
   });
-}
-);
+});
 

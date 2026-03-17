@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createMiddlewareSupabaseClient } from "@/lib/supabase/middleware";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareSupabaseClient(req, res);
   const {
@@ -35,4 +35,3 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico|auth).*)"],
 };
-

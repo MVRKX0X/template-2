@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import {
   getTradovateTrades,
   refreshAccessToken,
+  tradovateTradesToNormalized,
 } from "@/lib/tradovate";
 import { encrypt, decrypt } from "@/lib/encryption";
 import { computeMetricsFromTrades } from "@/lib/metricsCalculator";
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const metrics = computeMetricsFromTrades(trades);
+    const metrics = computeMetricsFromTrades(tradovateTradesToNormalized(trades));
     const performanceScore = calculatePerformanceScore(metrics);
 
     await supabase.from("performance_snapshots").insert({

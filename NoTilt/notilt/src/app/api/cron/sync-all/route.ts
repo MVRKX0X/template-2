@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import {
   getTradovateTrades,
   refreshAccessToken,
+  tradovateTradesToNormalized,
 } from "@/lib/tradovate";
 import { encrypt, decrypt } from "@/lib/encryption";
 import { computeMetricsFromTrades } from "@/lib/metricsCalculator";
@@ -68,7 +69,7 @@ export async function GET(req: NextRequest) {
         );
       }
 
-      const metrics = computeMetricsFromTrades(trades);
+      const metrics = computeMetricsFromTrades(tradovateTradesToNormalized(trades));
       const performanceScore = calculatePerformanceScore(metrics);
       const shouldVerify =
         metrics.totalTrades >= 90 || metrics.monthsOfData >= 3;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { ScoreRing } from "@/components/ui/ScoreRing";
@@ -14,7 +14,7 @@ const badgeColor: Record<string, string> = {
   default: "#6b7280",
 };
 
-export default function DashboardPage() {
+function DashboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [data, setData] = useState<any>(null);
@@ -399,6 +399,22 @@ export default function DashboardPage() {
         )}
       </main>
     </div>
+  );
+}
+
+function DashboardFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#060812]">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#00E5A0] border-t-transparent" />
+    </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<DashboardFallback />}>
+      <DashboardContent />
+    </Suspense>
   );
 }
 
