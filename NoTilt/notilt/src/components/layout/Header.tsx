@@ -6,11 +6,15 @@ import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { ListCommunityModal } from "@/components/community/ListCommunityModal";
 
+interface AuthState {
+  user: { email?: string } | null;
+  handle: string | null;
+  loaded: boolean;
+}
+
 export function Header() {
   const router = useRouter();
-  const supabase = createBrowserSupabaseClient();
-  const [user, setUser] = useState<{ email?: string } | null>(null);
-  const [handle, setHandle] = useState<string | null>(null);
+  const [auth, setAuth] = useState<AuthState>({ user: null, handle: null, loaded: false });
   const [menuOpen, setMenuOpen] = useState(false);
   const [communityModalOpen, setCommunityModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -18,34 +22,59 @@ export function Header() {
   useEffect(() => {
     let mounted = true;
 
-    async function loadUser() {
-      const {
-        data: { user: u },
-      } = await supabase.auth.getUser();
-      if (!mounted) return;
-      setUser(u ? { email: u.email } : null);
-
-      if (u) {
-        const { data } = await supabase
-          .from("traders")
-          .select("handle")
-          .eq("user_id", u.id)
-          .single();
-        if (mounted) setHandle(data?.handle ?? null);
+    // Use the server-side API endpoint for reliable initial auth detection.
+    // This always works because the server can read session cookies regardless
+    // of how they were set (OAuth callback, email login, etc.).
+    async function loadFromServer() {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        const json = await res.json();
+        if (!mounted) return;
+        setAuth({
+          user: json.user ? { email: json.user.email } : null,
+          handle: json.handle ?? null,
+          loaded: true,
+        });
+      } catch {
+        if (mounted) setAuth((prev) => ({ ...prev, loaded: true }));
       }
     }
 
-    loadUser();
+    loadFromServer();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+    // Also subscribe to real-time auth state changes (handles sign-in/sign-out
+    // without page reload, e.g. from the login page or logout button).
+    const supabase = createBrowserSupabaseClient();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return;
+
+      if (!session?.user) {
+        setAuth({ user: null, handle: null, loaded: true });
+        return;
+      }
+
+      // User signed in via client-side auth — fetch their handle from the server
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        const json = await res.json();
         if (!mounted) return;
-        setUser(session?.user ? { email: session.user.email } : null);
-        if (!session?.user) {
-          setHandle(null);
+        setAuth({
+          user: json.user ? { email: json.user.email } : { email: session.user.email },
+          handle: json.handle ?? null,
+          loaded: true,
+        });
+      } catch {
+        if (mounted) {
+          setAuth({
+            user: { email: session.user.email },
+            handle: null,
+            loaded: true,
+          });
         }
-      },
-    );
+      }
+    });
 
     return () => {
       mounted = false;
@@ -66,10 +95,14 @@ export function Header() {
 
   async function handleLogout() {
     setMenuOpen(false);
+    const supabase = createBrowserSupabaseClient();
     await supabase.auth.signOut();
-    router.push("/login");
+    setAuth({ user: null, handle: null, loaded: true });
+    router.push("/");
     router.refresh();
   }
+
+  const { user, handle } = auth;
 
   const initials = user?.email
     ? user.email.slice(0, 2).toUpperCase()
