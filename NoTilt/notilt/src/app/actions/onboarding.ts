@@ -33,5 +33,5 @@ export async function completeOnboarding(formData: {
     throw new Error(error.message)
   }
 
-  redirect('/dashboard')
+  redirect('/connect/tradovate?onboarding=1')
 }

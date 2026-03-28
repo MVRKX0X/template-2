@@ -50,6 +50,15 @@ export function CommunityFeed({ communities }: CommunityFeedProps) {
 
   return (
     <section className="space-y-4">
+      {/* Communities are demo-only for now */}
+      <div className="rounded-xl border border-[#fbbf2430] bg-[#fbbf2408] px-5 py-4 text-xs">
+        <p className="font-semibold text-[#fbbf24]">Community listings coming soon</p>
+        <p className="mt-0.5 text-[#6b7280]">
+          These are example communities. Own a trading community?{" "}
+          <span className="text-[#00E5A0]">Use &quot;List Your Community&quot; in the nav to get listed.</span>
+        </p>
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text-muted)]">
           Trading communities ranked by verified results

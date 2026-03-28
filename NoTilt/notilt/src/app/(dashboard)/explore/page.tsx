@@ -2,10 +2,7 @@ import { Header } from "@/components/layout/Header";
 import ExploreTabs from "@/components/explore/ExploreTabs";
 import { getTopTraders } from "@/lib/queries";
 import { TRADERS, COMMUNITIES } from "@/lib/mockData";
-import type {
-  ExploreTrader,
-  ExploreCommunity,
-} from "@/types/explore";
+import type { ExploreTrader, ExploreCommunity } from "@/types/explore";
 
 const badgeColor: Record<string, string> = {
   Elite: "#00E5A0",
@@ -25,12 +22,9 @@ export default async function ExplorePage() {
       const snap = t.performance_snapshots[0];
       const badge = t.badge ?? "Pro";
       const score = Math.round(t.performance_score ?? 0);
-
       const totalTrades = snap?.total_trades ?? 0;
       const monthsVerified =
-        totalTrades > 0
-          ? Math.max(Math.floor(totalTrades / 20), 1)
-          : 1;
+        totalTrades > 0 ? Math.max(Math.floor(totalTrades / 20), 1) : 1;
 
       return {
         id: t.id,
@@ -61,8 +55,7 @@ export default async function ExplorePage() {
     ? (TRADERS as unknown as ExploreTrader[])
     : liveTraders;
 
-  const communities: ExploreCommunity[] =
-    COMMUNITIES as unknown as ExploreCommunity[];
+  const communities: ExploreCommunity[] = COMMUNITIES as unknown as ExploreCommunity[];
 
   return (
     <div className="min-h-screen bg-[#060812] text-[color:var(--color-text-primary)]">
@@ -79,21 +72,15 @@ export default async function ExplorePage() {
             Find mentors with verified results.
           </h1>
           <p className="mx-auto max-w-md text-base leading-relaxed text-[#6b7280]">
-            If your mentor isn&apos;t on No Tilt, they have something to
-            hide. Every stat here comes from real uploaded trade history.
+            If your mentor isn&apos;t on No Tilt, they have something to hide.
+            Every stat here comes from real uploaded trade history.
           </p>
         </div>
 
+        {/* Score explanation */}
         <div className="mb-8 flex items-start gap-3 rounded-xl border border-[#1e2035] bg-[#0d0f22] px-5 py-4 text-xs text-[#6b7280]">
           <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[#00E5A015]">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#00E5A0"
-              strokeWidth="2"
-            >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E5A0" strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -104,13 +91,28 @@ export default async function ExplorePage() {
               Performance Score — not just PnL
             </p>
             <p>
-              Score = Profit Factor (30%) + Consistency (25%) + Win Rate
-              (20%) + Sharpe Ratio (15%) + Drawdown Control (10%). A $500
-              account with a 3× PF outscores a $100k account with a 1.2×
-              PF.
+              Score = Profit Factor (30%) + Consistency (25%) + Win Rate (20%) +
+              Sharpe Ratio (15%) + Drawdown Control (10%). A $500 account with a
+              3× PF outscores a $100k account with a 1.2× PF.
             </p>
           </div>
         </div>
+
+        {/* Demo data notice */}
+        {isDemo && (
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-[#fbbf2430] bg-[#fbbf2408] px-5 py-4 text-xs">
+            <span className="text-base">👀</span>
+            <div>
+              <p className="font-semibold text-[#fbbf24]">Demo data — be the first real trader here</p>
+              <p className="mt-0.5 text-[#6b7280]">
+                No verified traders yet. These are example profiles showing what the leaderboard will look like.{" "}
+                <a href="/signup" className="text-[#00E5A0] hover:underline">
+                  Upload your trade history to appear first →
+                </a>
+              </p>
+            </div>
+          </div>
+        )}
 
         <ExploreTabs
           traders={traders}
@@ -121,4 +123,3 @@ export default async function ExplorePage() {
     </div>
   );
 }
-
