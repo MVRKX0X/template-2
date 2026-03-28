@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 const PLATFORMS = ["Discord", "Telegram", "Skool", "Whop", "Circle", "Other"];
 const FOCUS_OPTIONS = [
@@ -107,12 +108,12 @@ export function ListCommunityModal({ isOpen, onClose, isLoggedIn }: Props) {
               You need to be signed in and have a verified trading profile to
               list your community.
             </p>
-            <a
+            <Link
               href="/signup"
               className="inline-block rounded-lg bg-[#00E5A0] px-6 py-2.5 text-sm font-bold text-black hover:bg-[#00c988]"
             >
               Get Verified →
-            </a>
+            </Link>
           </div>
         ) : success ? (
           <div className="py-6 text-center">

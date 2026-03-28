@@ -24,7 +24,12 @@ export async function GET(req: NextRequest) {
       }
 
       if (data.session) {
-        // Check if trader profile exists
+        // If a specific next destination was requested, use it
+        if (next && next !== '/onboarding') {
+          return NextResponse.redirect(`${origin}${next}`)
+        }
+
+        // Otherwise check if trader profile exists
         const { data: trader } = await supabase
           .from('traders')
           .select('id')

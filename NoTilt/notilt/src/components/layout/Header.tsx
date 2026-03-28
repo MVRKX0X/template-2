@@ -79,7 +79,7 @@ export function Header() {
     <>
     <header className="sticky top-0 z-20 border-b border-[color:var(--color-border-subtle)] bg-[color:var(--color-bg-surface-base)]/95 backdrop-blur">
       <div className="mx-auto flex h-16 min-w-0 max-w-5xl items-center gap-3 px-4">
-        <Link href="/explore" className="flex shrink-0 items-center gap-2">
+        <Link href="/" className="flex shrink-0 items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[color:var(--color-accent-green)] text-xs font-semibold text-black">
             NT
           </div>
@@ -100,6 +100,12 @@ export function Header() {
             className="shrink-0 text-sm text-[#6b7280] transition-colors hover:text-[#f1f5f9]"
           >
             Explore
+          </Link>
+          <Link
+            href="/pricing"
+            className="hidden shrink-0 text-sm text-[#6b7280] transition-colors hover:text-[#f1f5f9] sm:block"
+          >
+            Pricing
           </Link>
           {user && (
             <>

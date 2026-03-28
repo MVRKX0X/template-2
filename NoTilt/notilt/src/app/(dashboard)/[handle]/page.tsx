@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { ScoreRing } from "@/components/ui/ScoreRing";
 import { MetricBar } from "@/components/ui/MetricBar";
@@ -104,12 +105,12 @@ export default async function TraderProfile({
     <div className="min-h-screen bg-[#060812] text-[color:var(--color-text-primary)]">
       <Header />
       <main className="mx-auto max-w-2xl px-6 pb-16 pt-8">
-        <a
+        <Link
           href="/explore"
           className="mb-8 inline-flex items-center gap-2 text-sm text-[#6b7280] transition-colors hover:text-[#f1f5f9]"
         >
           ← Explore
-        </a>
+        </Link>
 
         <section className="mb-10 mt-2 flex flex-col gap-6 md:flex-row md:items-start">
           <div>
@@ -361,12 +362,12 @@ export default async function TraderProfile({
               Upload your verified trade history and let your results
               rank you on the leaderboard.
             </p>
-            <a
+            <Link
               href="/connect/tradovate"
               className="inline-block rounded-lg bg-[#00E5A0] px-6 py-3 text-sm font-bold text-black transition-colors hover:bg-[#00c988]"
             >
               Upload My Trade History →
-            </a>
+            </Link>
           </section>
         )}
       </main>

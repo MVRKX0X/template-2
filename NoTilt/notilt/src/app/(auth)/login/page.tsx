@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") ?? "/dashboard";
   const supabase = createBrowserSupabaseClient();
 
   const [email, setEmail] = useState("");
@@ -27,7 +29,7 @@ export default function LoginPage() {
       setError(error.message);
       return;
     }
-    router.push("/explore");
+    router.push(next);
   }
 
   async function handleGoogle() {
@@ -36,7 +38,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
         queryParams: {
           access_type: "offline",
           prompt: "consent",
@@ -175,3 +177,16 @@ export default function LoginPage() {
   );
 }
 
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="rounded-2xl border border-[#1e2035] bg-[#0a0c1a] p-8 shadow-xl">
+        <div className="flex items-center justify-center py-12">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#00E5A0] border-t-transparent" />
+        </div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
+  );
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { ScoreRing } from "@/components/ui/ScoreRing";
@@ -203,32 +204,32 @@ function DashboardContent() {
                     )}
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    <a
-                      href={`/` + data.trader.handle}
+                    <Link
+                      href={`/${data.trader.handle}`}
                       className="text-sm text-[#00E5A0] hover:underline"
                     >
                       View public profile →
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                       href="/journal"
                       className="text-sm text-[#6b7280] hover:text-[#f1f5f9]"
                     >
                       View Trade Journal →
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                       href="/explore"
                       className="text-sm text-[#6b7280] hover:text-[#f1f5f9]"
                     >
                       Browse leaderboard →
-                    </a>
+                    </Link>
                   </div>
                 </div>
-                <a
+                <Link
                   href="/connect/tradovate"
                   className="whitespace-nowrap rounded-lg border border-[#00E5A040] bg-[#00E5A015] px-4 py-2 text-sm font-semibold text-[#00E5A0] hover:bg-[#00E5A025]"
                 >
                   Upload New Data →
-                </a>
+                </Link>
               </section>
 
               {(!data.uploads ||
@@ -249,12 +250,12 @@ function DashboardContent() {
                     Rithmic, or MT5 and upload your CSV to get
                     verified.
                   </p>
-                  <a
+                  <Link
                     href="/connect/tradovate"
-                    className="inline-block rounded-lg bg-[#00E5A0] px-6 py-3 text-sm font-bold text:black hover:bg-[#00c988]"
+                    className="inline-block rounded-lg bg-[#00E5A0] px-6 py-3 text-sm font-bold text-black hover:bg-[#00c988]"
                   >
                     Upload Trade History →
-                  </a>
+                  </Link>
                 </section>
               )}
 

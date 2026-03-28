@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Header } from "@/components/layout/Header";
 import { getTopTraders } from "@/lib/queries";
 
 const SCORE_BREAKDOWN = [
@@ -47,48 +48,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#060812] text-[#f1f5f9]">
-      {/* Nav */}
-      <header className="sticky top-0 z-20 border-b border-[#1e2035] bg-[#060812]/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00E5A0] text-xs font-bold text-black">
-              NT
-            </div>
-            <span
-              className="text-sm font-semibold tracking-wide"
-              style={{ fontFamily: "Syne, system-ui, sans-serif" }}
-            >
-              No Tilt
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/explore"
-              className="hidden text-sm text-[#6b7280] hover:text-[#f1f5f9] sm:block"
-            >
-              Leaderboard
-            </Link>
-            <Link
-              href="/pricing"
-              className="hidden text-sm text-[#6b7280] hover:text-[#f1f5f9] sm:block"
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/login"
-              className="text-sm text-[#6b7280] hover:text-[#f1f5f9]"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/signup"
-              className="rounded-lg bg-[#00E5A0] px-4 py-2 text-sm font-semibold text-black hover:bg-[#00c988]"
-            >
-              Get Verified →
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main>
         {/* Hero */}
