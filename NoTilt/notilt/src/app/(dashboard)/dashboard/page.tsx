@@ -194,6 +194,13 @@ function DashboardContent() {
                       ` · Last upload ${new Date(
                         data.trader.lastUploadAt,
                       ).toLocaleDateString()}`}
+                    {data.trader.leaderboardRank != null && (
+                      <span className="ml-3 font-semibold text-[#00E5A0]">
+                        Rank #{data.trader.leaderboardRank}
+                        {data.trader.leaderboardTotal != null &&
+                          ` of ${data.trader.leaderboardTotal}`}
+                      </span>
+                    )}
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <a

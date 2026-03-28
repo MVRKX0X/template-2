@@ -76,7 +76,7 @@ export async function getTraderByHandle(handle: string) {
     .eq("handle", handle)
     .order("snapshot_date", {
       foreignTable: "performance_snapshots",
-      ascending: true,
+      ascending: false,
     })
     .order("uploaded_at", {
       foreignTable: "csv_uploads",

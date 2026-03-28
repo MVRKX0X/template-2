@@ -30,6 +30,12 @@ type TradesResponse = {
   page: number;
   limit: number;
   pages: number;
+  stats: {
+    totalTrades: number;
+    winRate: number;
+    netPnl: number;
+    profitFactor: number;
+  };
 };
 
 const SETUP_TAGS = [
@@ -52,6 +58,12 @@ function JournalContent() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(0);
+  const [stats, setStats] = useState<TradesResponse["stats"]>({
+    totalTrades: 0,
+    winRate: 0,
+    netPnl: 0,
+    profitFactor: 0,
+  });
   const [savingId, setSavingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -109,6 +121,7 @@ function JournalContent() {
           setTrades(json.trades);
           setTotal(json.total);
           setPages(json.pages);
+          setStats(json.stats);
         }
       } catch {
         setError("Failed to load trades");
@@ -128,48 +141,6 @@ function JournalContent() {
     trades.forEach((t) => set.add(t.symbol));
     return Array.from(set).sort();
   }, [trades]);
-
-  const stats = useMemo(() => {
-    if (!trades.length) {
-      return {
-        totalTrades: total,
-        winRate: 0,
-        netPnl: 0,
-        profitFactor: 0,
-      };
-    }
-    let wins = 0;
-    let losses = 0;
-    let grossProfit = 0;
-    let grossLoss = 0;
-    let net = 0;
-    trades.forEach((t) => {
-      net += t.net_pnl;
-      if (t.net_pnl > 0) {
-        wins += 1;
-        grossProfit += t.net_pnl;
-      } else if (t.net_pnl < 0) {
-        losses += 1;
-        grossLoss += Math.abs(t.net_pnl);
-      }
-    });
-    const totalCount = total || trades.length;
-    const winRate =
-      totalCount > 0 ? (wins / totalCount) * 100 : 0;
-    const profitFactor =
-      grossLoss === 0
-        ? grossProfit > 0
-          ? 99
-          : 0
-        : grossProfit / grossLoss;
-
-    return {
-      totalTrades: totalCount,
-      winRate,
-      netPnl: net,
-      profitFactor,
-    };
-  }, [trades, total]);
 
   const handleClearFilters = () => {
     setFilters({

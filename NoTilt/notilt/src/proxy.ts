@@ -10,25 +10,29 @@ export async function proxy(req: NextRequest) {
 
   const path = req.nextUrl.pathname;
 
-  // Routes that require auth
-  const protectedRoutes = ["/dashboard", "/explore"];
+  // Routes that require authentication
+  const protectedRoutes = [
+    "/dashboard",
+    "/journal",
+    "/connect/tradovate",
+    "/onboarding",
+  ];
   const isProtectedRoute = protectedRoutes.some((r) => path.startsWith(r));
 
-  // Routes that logged-in users should not see
-  const authOnlyRoutes = ["/login", "/signup"];
-  const isAuthOnlyRoute = authOnlyRoutes.some((r) => path.startsWith(r));
+  // Routes that authenticated users should be redirected away from
+  const guestOnlyRoutes = ["/login", "/signup"];
+  const isGuestOnlyRoute = guestOnlyRoutes.some((r) => path.startsWith(r));
 
-  // Redirect unauthenticated users away from protected routes
   if (!session && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("next", path);
+    return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect authenticated users away from login/signup
-  if (session && isAuthOnlyRoute) {
+  if (session && isGuestOnlyRoute) {
     return NextResponse.redirect(new URL("/explore", req.url));
   }
 
-  // /onboarding is allowed for authenticated users — do not redirect
   return res;
 }
 

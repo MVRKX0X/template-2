@@ -68,33 +68,67 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const metrics = computeMetricsFromTrades(
-    parseResult.trades,
-  );
-  const performanceScore = calculatePerformanceScore(
-    metrics,
-  );
+  // Prevent duplicate uploads: check if an upload with the same date range already exists
+  if (parseResult.dateRange) {
+    const fromDate = parseResult.dateRange.from.split("T")[0];
+    const toDate = parseResult.dateRange.to.split("T")[0];
+
+    const { data: existing } = await supabase
+      .from("csv_uploads")
+      .select("id")
+      .eq("trader_id", trader.id)
+      .eq("date_range_from", fromDate)
+      .eq("date_range_to", toDate)
+      .limit(1)
+      .single();
+
+    if (existing) {
+      return NextResponse.json(
+        {
+          error:
+            "A CSV covering this exact date range has already been uploaded. Delete the existing upload first if you want to replace it.",
+        },
+        { status: 409 },
+      );
+    }
+  }
+
+  const metrics = computeMetricsFromTrades(parseResult.trades);
+  const performanceScore = calculatePerformanceScore(metrics);
 
   const shouldVerify =
     metrics.totalTrades >= 90 || metrics.monthsOfData >= 3;
 
   const snapshotDate =
-    parseResult.dateRange?.to ??
+    parseResult.dateRange?.to?.split("T")[0] ??
     new Date().toISOString().split("T")[0];
 
-  await supabase.from("performance_snapshots").insert({
-    trader_id: trader.id,
-    snapshot_date: snapshotDate,
-    profit_factor: metrics.profitFactor,
-    win_rate: metrics.winRate,
-    sharpe_ratio: metrics.sharpeRatio,
-    max_drawdown: metrics.maxDrawdown,
-    avg_rr: metrics.avgRR,
-    consistency_score: metrics.consistencyScore,
-    total_trades: metrics.totalTrades,
-    monthly_return: metrics.monthlyReturn,
-    performance_score: performanceScore,
-  });
+  // Upsert snapshot so re-uploads for the same date don't fail silently
+  const { error: snapshotError } = await supabase
+    .from("performance_snapshots")
+    .upsert(
+      {
+        trader_id: trader.id,
+        snapshot_date: snapshotDate,
+        profit_factor: metrics.profitFactor,
+        win_rate: metrics.winRate,
+        sharpe_ratio: metrics.sharpeRatio,
+        max_drawdown: metrics.maxDrawdown,
+        avg_rr: metrics.avgRR,
+        consistency_score: metrics.consistencyScore,
+        total_trades: metrics.totalTrades,
+        monthly_return: metrics.monthlyReturn,
+        performance_score: performanceScore,
+      },
+      { onConflict: "trader_id,snapshot_date" },
+    );
+
+  if (snapshotError) {
+    return NextResponse.json(
+      { error: "Failed to save performance snapshot: " + snapshotError.message },
+      { status: 500 },
+    );
+  }
 
   const uploadFields = {
     trader_id: trader.id,
@@ -111,13 +145,18 @@ export async function POST(req: NextRequest) {
     performance_score: performanceScore,
   };
 
-  const { data: uploadRecord } = await supabase
+  const { data: uploadRecord, error: uploadError } = await supabase
     .from("csv_uploads")
-    .insert({
-      ...uploadFields,
-    })
+    .insert({ ...uploadFields })
     .select("id")
     .single();
+
+  if (uploadError) {
+    return NextResponse.json(
+      { error: "Failed to save upload record: " + uploadError.message },
+      { status: 500 },
+    );
+  }
 
   const tradeRows = parseResult.trades.map((trade) => {
     const closedAt = new Date(trade.timestamp);
@@ -143,7 +182,13 @@ export async function POST(req: NextRequest) {
   });
 
   if (tradeRows.length > 0) {
-    await supabase.from("trades").insert(tradeRows);
+    const { error: tradesError } = await supabase
+      .from("trades")
+      .insert(tradeRows);
+    if (tradesError) {
+      // Non-fatal: log but don't block the response
+      console.error("Failed to insert trades:", tradesError.message);
+    }
   }
 
   await supabase
@@ -223,18 +268,21 @@ export async function DELETE(req: NextRequest) {
 
   const { data: latestSnapshot } = await supabase
     .from("performance_snapshots")
-    .select("performance_score, total_trades")
+    .select("performance_score, total_trades, monthly_return")
     .eq("trader_id", trader.id)
     .order("snapshot_date", { ascending: false })
     .limit(1)
     .single();
+
+  // Re-check verification using both criteria, consistent with upload
+  const meetsTradeThreshold = (latestSnapshot?.total_trades ?? 0) >= 90;
 
   const newUploadCount = Math.max(0, (trader.upload_count ?? 1) - 1);
   await supabase
     .from("traders")
     .update({
       performance_score: latestSnapshot?.performance_score ?? null,
-      verified: (latestSnapshot?.total_trades ?? 0) >= 90,
+      verified: meetsTradeThreshold,
       upload_count: newUploadCount,
       score_updated_at: new Date().toISOString(),
     })
@@ -242,4 +290,3 @@ export async function DELETE(req: NextRequest) {
 
   return NextResponse.json({ success: true });
 }
-

@@ -28,6 +28,29 @@ export async function GET(req: NextRequest) {
   const latestSnapshot = snapshots[0] ?? null;
   const uploads = traderData.csv_uploads ?? [];
 
+  // Compute leaderboard rank for verified traders
+  let leaderboardRank: number | null = null;
+  let leaderboardTotal: number | null = null;
+
+  if (traderData.verified && traderData.performance_score != null) {
+    // Count how many verified traders score higher
+    const { count: higherCount } = await supabase
+      .from("traders")
+      .select("id", { count: "exact", head: true })
+      .eq("verified", true)
+      .not("performance_score", "is", null)
+      .gt("performance_score", traderData.performance_score);
+
+    const { count: totalCount } = await supabase
+      .from("traders")
+      .select("id", { count: "exact", head: true })
+      .eq("verified", true)
+      .not("performance_score", "is", null);
+
+    leaderboardRank = (higherCount ?? 0) + 1;
+    leaderboardTotal = totalCount ?? 0;
+  }
+
   return NextResponse.json({
     trader: {
       id: traderData.id,
@@ -38,9 +61,10 @@ export async function GET(req: NextRequest) {
       performanceScore: traderData.performance_score,
       uploadCount: traderData.upload_count,
       lastUploadAt: traderData.last_upload_at,
+      leaderboardRank,
+      leaderboardTotal,
     },
     latestSnapshot,
     uploads,
   });
 }
-
