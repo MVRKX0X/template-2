@@ -45,6 +45,14 @@ export async function GET(req: NextRequest) {
     const { data, error: exchangeError } =
       await supabase.auth.exchangeCodeForSession(code);
 
+    console.log("[auth/callback] exchangeCodeForSession result:", {
+      hasSession: !!data.session,
+      userId: data.session?.user?.id ?? null,
+      pendingCookieCount: pendingCookies.length,
+      pendingCookieNames: pendingCookies.map((c) => c.name),
+      error: exchangeError?.message ?? null,
+    });
+
     if (exchangeError || !data.session) {
       const msg = exchangeError?.message ?? "session_exchange_failed";
       console.error("Code exchange error:", msg);
@@ -69,12 +77,16 @@ export async function GET(req: NextRequest) {
       destination = trader ? "/dashboard" : "/onboarding";
     }
 
+    console.log("[auth/callback] redirecting to:", destination);
+
     // Build the redirect response and attach every session cookie to it
     const response = NextResponse.redirect(`${origin}${destination}`);
 
     for (const { name, value, options } of pendingCookies) {
       response.cookies.set(name, value, options ?? {});
     }
+
+    console.log("[auth/callback] cookies applied to response:", response.cookies.getAll().map((c) => ({ name: c.name, hasValue: !!c.value })));
 
     return response;
   } catch (err) {

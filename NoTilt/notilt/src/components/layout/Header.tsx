@@ -29,13 +29,15 @@ export function Header() {
       try {
         const res = await fetch("/api/auth/me", { credentials: "include" });
         const json = await res.json();
+        console.log("[Header] loadFromServer result:", { user: json.user?.email ?? null, handle: json.handle });
         if (!mounted) return;
         setAuth({
           user: json.user ? { email: json.user.email } : null,
           handle: json.handle ?? null,
           loaded: true,
         });
-      } catch {
+      } catch (err) {
+        console.error("[Header] loadFromServer error:", err);
         if (mounted) setAuth((prev) => ({ ...prev, loaded: true }));
       }
     }
@@ -48,6 +50,7 @@ export function Header() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log("[Header] onAuthStateChange:", _event, "session:", session?.user?.email ?? null);
       if (!mounted) return;
 
       if (!session?.user) {
@@ -59,6 +62,7 @@ export function Header() {
       try {
         const res = await fetch("/api/auth/me", { credentials: "include" });
         const json = await res.json();
+        console.log("[Header] onAuthStateChange /api/auth/me result:", { user: json.user?.email ?? null });
         if (!mounted) return;
         setAuth({
           user: json.user ? { email: json.user.email } : { email: session.user.email },
